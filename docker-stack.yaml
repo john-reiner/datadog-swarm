@@ -1,0 +1,28 @@
+services:
+
+  nginx:
+    image: nginx
+    deploy:
+      replicas: 4
+    labels:
+      com.datadoghq.ad.logs: '[{"source": "nginx", "service": "nginx"}]'
+    ports:
+      - "8080:80"
+  
+  datadog:
+    image: gcr.io/datadoghq/agent:latest
+    deploy:
+      mode: global
+    environment:
+     - DD_API_KEY=<your-api-key>
+     - DD_SITE=datadoghq.com
+     - DD_LOGS_ENABLED=true
+     - DD_PROCESS_AGENT_ENABLED=true
+
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock:ro
+     - /proc/:/host/proc/:ro
+     - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+     - /var/lib/docker/containers:/var/lib/docker/containers:ro
+     - /etc/passwd:/etc/passwd:ro
+
